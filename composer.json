@@ -23,9 +23,11 @@
         "symfony/yaml": "5.1.*"
     },
     "require-dev": {
+        "lchrusciel/api-test-case": "^5.0",
         "phpmd/phpmd": "^2.8",
         "squizlabs/php_codesniffer": "^3.5",
-        "symfony/maker-bundle": "^1.20"
+        "symfony/maker-bundle": "^1.20",
+        "symfony/phpunit-bridge": "^5.1"
     },
     "config": {
         "optimize-autoloader": true,

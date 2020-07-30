@@ -51,11 +51,11 @@ class TaskRequest
     public function __construct(Request $request)
     {
         $data = json_decode($request->getContent(), true);
-        $this->title = $data['title'];
-        $this->points = $data['points'];
-        $this->isDone = $data['is_done'];
-        $this->parentId = $data['parent_id'];
-        $this->userId = $data['user_id'];
+        $this->title = $data['title'] ?? null;
+        $this->points = $data['points'] ?? null;
+        $this->isDone = $data['is_done'] ?? null;
+        $this->parentId = $data['parent_id'] ?? null;
+        $this->userId = $data['user_id'] ?? null;
     }
 
     public function getTitle(): string

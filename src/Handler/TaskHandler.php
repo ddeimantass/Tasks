@@ -58,6 +58,8 @@ class TaskHandler
             return new Response($task, Response::HTTP_CREATED);
         } catch (Exception $exception) {
             return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $exception) {
+            return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -71,6 +73,8 @@ class TaskHandler
             return new Response($task, Response::HTTP_CREATED);
         } catch (Exception $exception) {
             return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+        } catch (\Throwable $exception) {
+            return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -113,7 +117,6 @@ class TaskHandler
 
         $this->entityManager->persist($task);
         $this->entityManager->flush();
-
 
         return $this->serializer->serialize($task, 'json');
     }

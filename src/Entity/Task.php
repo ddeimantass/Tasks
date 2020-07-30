@@ -43,7 +43,7 @@ class Task
     private $userId;
 
     /**
-     * @ORM\OneToOne(targetEntity="Task")
+     * @ORM\ManyToOne(targetEntity="Task")
      * @ORM\JoinColumn(name="parent_id")
      */
     private $parent;

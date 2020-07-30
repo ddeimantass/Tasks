@@ -1,0 +1,7 @@
+App\Entity\Task:
+  task1:
+    title: "Task 1"
+    isDone: 0
+    points: 5
+    userId: 1
+    parent: ~

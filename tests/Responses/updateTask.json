@@ -1,0 +1,9 @@
+{
+  "id": @integer@,
+  "title": "Task 2",
+  "points": 4,
+  "is_done": true,
+  "user_id": 2,
+  "created_at": @string@,
+  "updated_at": @string@
+}

@@ -7,6 +7,7 @@ namespace App\Entity;
 use App\Repository\TaskRepository;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\Timestampable;
 use JMS\Serializer\Annotation as JMS;
@@ -60,7 +61,7 @@ class Task
 
     /**
      * @var Task[]
-     * @JMS\Exclude
+     * @JMS\Groups({"list"})
      * @ORM\OneToMany(targetEntity="Task", mappedBy="parent")
      */
     private $children;
@@ -176,9 +177,9 @@ class Task
     }
 
     /**
-     * @return Task[]
+     * @return Collection
      */
-    public function getChildren(): array
+    public function getChildren(): Collection
     {
         return $this->children;
     }

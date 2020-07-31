@@ -8,6 +8,7 @@ use App\Entity\Task;
 use App\Request\TaskRequest;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use JMS\Serializer\SerializationContext;
 use JMS\Serializer\SerializerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -44,8 +45,9 @@ class TaskHandler
 
     public function getList(): Response
     {
-        $tasks = $this->entityManager->getRepository(Task::class)->findAll();
-        $data = $this->serializer->serialize($tasks, 'json');
+        $tasks = $this->entityManager->getRepository(Task::class)->findBy(['parent' => null]);
+        $context = SerializationContext::create()->setGroups(['list', 'Default']);
+        $data = $this->serializer->serialize($tasks, 'json', $context);
 
         return new Response($data, Response::HTTP_OK);
     }
@@ -127,6 +129,32 @@ class TaskHandler
         $this->entityManager->persist($task);
         $this->entityManager->flush();
 
+        $this->updateParent($parent);
+
         return $this->serializer->serialize($task, 'json');
+    }
+
+    private function updateParent(?Task $parent): void
+    {
+        if (null === $parent) {
+            return;
+        }
+
+        $children = $parent->getChildren();
+        $isDone = true;
+        $points = 0;
+
+        foreach ($children as $child) {
+            $points += $child->getPoints();
+            $isDone = $isDone && $child->getIsDone();
+        }
+
+        $parent->setPoints($points)
+            ->setIsDone($isDone);
+
+        $this->entityManager->persist($parent);
+        $this->entityManager->flush();
+
+        $this->updateParent($parent->getParent());
     }
 }

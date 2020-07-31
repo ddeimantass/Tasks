@@ -6,6 +6,7 @@ namespace App\Request;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints as AppAssert;
 
 class TaskRequest
 {
@@ -23,6 +24,7 @@ class TaskRequest
     /**
      * @var int
      * @Assert\NotBlank()
+     * @AppAssert\UserExists()
      */
     private $userId;
 

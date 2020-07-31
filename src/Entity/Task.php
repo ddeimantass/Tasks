@@ -72,7 +72,7 @@ class Task
      * @Gedmo\Timestampable(on="create")
      * @ORM\Column(type="datetime")
      */
-    protected $createdAt;
+    private $createdAt;
 
     /**
      * @var DateTime
@@ -80,7 +80,14 @@ class Task
      * @Gedmo\Timestampable(on="update")
      * @ORM\Column(type="datetime")
      */
-    protected $updatedAt;
+    private $updatedAt;
+
+    /**
+     * @var int
+     * @JMS\Exclude
+     * @ORM\Column(type="integer")
+     */
+    private $level;
 
     public function __construct()
     {
@@ -176,9 +183,6 @@ class Task
         return $this->updatedAt;
     }
 
-    /**
-     * @return Collection
-     */
     public function getChildren(): Collection
     {
         return $this->children;
@@ -195,6 +199,18 @@ class Task
         return $this;
     }
 
+    public function getLevel(): int
+    {
+        return $this->level;
+    }
+
+    public function setLevel(int $level): self
+    {
+        $this->level = $level;
+
+        return $this;
+    }
+
     /**
      * @JMS\VirtualProperty
      * @JMS\SerializedName("parent_id")
@@ -202,5 +218,22 @@ class Task
     public function getParentId(): ?int
     {
         return $this->parent ? $this->parent->getId() : null;
+    }
+
+    public function getDonePoints(): int
+    {
+        $done = 0;
+        foreach ($this->children as $child) {
+            if ($child->isDone) {
+                $done += $child->getPoints();
+                continue;
+            }
+
+            if (\count($child->getChildren()) > 0) {
+                $done += $child->getDonePoints();
+            }
+        }
+
+        return $done;
     }
 }

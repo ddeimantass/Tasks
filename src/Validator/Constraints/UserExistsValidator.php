@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Validator\Constraints;
 
+use App\Service\UsersClient;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
@@ -11,6 +12,16 @@ use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
 class UserExistsValidator extends ConstraintValidator
 {
+    /**
+     * @var UsersClient
+     */
+    private $client;
+
+    public function __construct(UsersClient $client)
+    {
+        $this->client = $client;
+    }
+
     public function validate($value, Constraint $constraint)
     {
         if (!$constraint instanceof UserExists) {
@@ -25,19 +36,10 @@ class UserExistsValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'int');
         }
 
-        $usersIds = $this->getUsersIds();
+        $usersIds = $this->client->getUsersIds();
 
         if (!in_array($value, $usersIds)) {
-            $this->context->buildViolation($constraint->message)
-                ->addViolation();
+            $this->context->buildViolation($constraint->message)->addViolation();
         }
-    }
-
-    private function getUsersIds(): array
-    {
-        $usersJson = file_get_contents('https://gitlab.iterato.lt/snippets/3/raw');
-        $users = json_decode($usersJson, true);
-
-        return array_column($users['data'], 'id');
     }
 }

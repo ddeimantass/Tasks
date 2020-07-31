@@ -2,7 +2,7 @@
   "id": @integer@,
   "title": "Task 1",
   "points": 3,
-  "is_done": false,
+  "is_done": 0,
   "user_id": 1,
   "created_at": @string@,
   "updated_at": @string@

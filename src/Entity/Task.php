@@ -6,6 +6,7 @@ namespace App\Entity;
 
 use App\Repository\TaskRepository;
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Gedmo\Timestampable\Traits\Timestampable;
 use JMS\Serializer\Annotation as JMS;
@@ -52,10 +53,17 @@ class Task
     /**
      * @var Task|null
      * @JMS\Exclude
-     * @ORM\ManyToOne(targetEntity="Task")
+     * @ORM\ManyToOne(targetEntity="Task", inversedBy="children")
      * @ORM\JoinColumn(name="parent_id")
      */
     private $parent;
+
+    /**
+     * @var Task[]
+     * @JMS\Exclude
+     * @ORM\OneToMany(targetEntity="Task", mappedBy="parent")
+     */
+    private $children;
 
     /**
      * @var DateTime
@@ -72,6 +80,11 @@ class Task
      * @ORM\Column(type="datetime")
      */
     protected $updatedAt;
+
+    public function __construct()
+    {
+        $this->children = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -160,6 +173,25 @@ class Task
     public function getUpdatedAt(): DateTime
     {
         return $this->updatedAt;
+    }
+
+    /**
+     * @return Task[]
+     */
+    public function getChildren(): array
+    {
+        return $this->children;
+    }
+
+    /**
+     * @param Task[] $children
+     * @return $this
+     */
+    public function setChildren(array $children): self
+    {
+        $this->children = $children;
+
+        return $this;
     }
 
     /**

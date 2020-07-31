@@ -25,7 +25,7 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/", methods="GET")
+     * @Route("", methods="GET")
      *
      * @return Response
      */
@@ -35,7 +35,7 @@ class TaskController extends AbstractController
     }
 
     /**
-     * @Route("/", methods="POST")
+     * @Route("", methods="POST")
      * @param Request $request
      *
      * @return Response

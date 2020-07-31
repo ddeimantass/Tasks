@@ -15,6 +15,8 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class TaskHandler
 {
+    private const HEADERS = ['Content-Type' => 'application/json'];
+
     /**
      * @var SerializerInterface
      */
@@ -55,11 +57,13 @@ class TaskHandler
             $this->validate($taskRequest);
             $task = $this->saveTask($taskRequest);
 
-            return new Response($task, Response::HTTP_CREATED);
+            return new Response($task, Response::HTTP_CREATED, self::HEADERS);
         } catch (Exception $exception) {
-            return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+//            var_dump($exception->getMessage());
+//            die;
+            return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST, self::HEADERS);
         } catch (\Throwable $exception) {
-            return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR, self::HEADERS);
         }
     }
 
@@ -70,11 +74,13 @@ class TaskHandler
             $this->validate($taskRequest);
             $task = $this->saveTask($taskRequest, $task);
 
-            return new Response($task, Response::HTTP_CREATED);
+            return new Response($task, Response::HTTP_CREATED, self::HEADERS);
         } catch (Exception $exception) {
-            return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST);
+//            var_dump($exception->getMessage(), $exception->getFile(), $exception->getLine());
+//            die;
+            return new Response($exception->getMessage(), Response::HTTP_BAD_REQUEST, self::HEADERS);
         } catch (\Throwable $exception) {
-            return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
+            return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR, self::HEADERS);
         }
     }
 
@@ -106,8 +112,11 @@ class TaskHandler
             $task = new Task();
         }
 
-        /** @var Task $parent */
-        $parent = $this->entityManager->find(Task::class, $taskRequest->getParentId());
+        $parent = null;
+        if ($taskRequest->getParentId()) {
+            /** @var Task $parent */
+            $parent = $this->entityManager->find(Task::class, $taskRequest->getParentId());
+        }
 
         $task->setTitle($taskRequest->getTitle())
             ->setPoints($taskRequest->getPoints())

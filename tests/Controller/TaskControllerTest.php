@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 
 class TaskControllerTest extends JsonApiTestCase
 {
-    private const URI = '/api/task/';
+    private const URI = '/api/task';
 
     /**
      * @var EntityManagerInterface
@@ -93,7 +93,7 @@ class TaskControllerTest extends JsonApiTestCase
         $task = $this->getEntityManager()->getRepository(Task::class)->findOneBy(['title' => 'Task 1']);
         $this->client->request(
             Request::METHOD_PUT,
-            self::URI . $task->getId(),
+            self::URI . '/' . $task->getId(),
             [],
             [],
             [],
@@ -122,7 +122,7 @@ class TaskControllerTest extends JsonApiTestCase
         $task = $this->getEntityManager()->getRepository(Task::class)->findOneBy(['title' => 'Task 1']);
         $this->client->request(
             Request::METHOD_PUT,
-            self::URI . $task->getId(),
+            self::URI . '/' . $task->getId(),
             [],
             [],
             [],

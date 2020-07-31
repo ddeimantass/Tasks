@@ -4,11 +4,10 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
-use App\DTO\UserTasksModel;
 use App\Entity\Task;
 use App\Exception\MaxDepthException;
 use App\Request\TaskRequest;
-use App\Service\UsersClient;
+use App\Service\UserTasksProvider;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use JMS\Serializer\SerializationContext;
@@ -37,27 +36,25 @@ class TaskHandler
     private $validator;
 
     /**
-     * @var UsersClient
+     * @var UserTasksProvider
      */
-    private $client;
+    private $provider;
 
     public function __construct(
         SerializerInterface $serializer,
         EntityManagerInterface $entityManager,
         ValidatorInterface $validator,
-        UsersClient $client
+        UserTasksProvider $provider
     ) {
         $this->serializer = $serializer;
         $this->entityManager = $entityManager;
         $this->validator = $validator;
-        $this->client = $client;
+        $this->provider = $provider;
     }
 
     public function getList(): Response
     {
-        /** @var Task[] $tasks */
-        $tasks = $this->entityManager->getRepository(Task::class)->findBy(['parent' => null]);
-        $usersModels = $this->getUsersTasksModels($tasks);
+        $usersModels = $this->provider->getUsersTasksModels();
         $context = SerializationContext::create()->setGroups(['list', 'Default']);
         $data = $this->serializer->serialize($usersModels, 'json', $context);
 
@@ -92,48 +89,6 @@ class TaskHandler
         } catch (\Throwable $exception) {
             return new Response('', Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    /**
-     * @param Task[] $mainTasks
-     * @return UserTasksModel[]
-     */
-    public function getUsersTasksModels(array $mainTasks): array
-    {
-        $usersDetails = $usersModels = [];
-        foreach ($mainTasks as $task) {
-            $this->setDetails($usersDetails, $task);
-        }
-
-        $users = $this->client->getUsers();
-        foreach ($usersDetails as $id => $userDetails) {
-            $fullName = isset($users[$id]) ? $users[$id]->getFullName() : 'Unknown';
-            $usersModels[] = new UserTasksModel(
-                $fullName,
-                $userDetails['totalPoints'],
-                $userDetails['donePoints'],
-                $userDetails['tasks']
-            );
-        }
-
-        return $usersModels;
-    }
-
-    /**
-     * @param array $usersDetails
-     * @param Task $task
-     */
-    private function setDetails(array &$usersDetails, Task $task): void
-    {
-        if (isset($usersDetails[$task->getUserId()])) {
-            $usersDetails[$task->getUserId()]['totalPoints'] += $task->getPoints();
-            $usersDetails[$task->getUserId()]['donePoints'] += $task->getDonePoints();
-        } else {
-            $usersDetails[$task->getUserId()]['totalPoints'] = $task->getPoints();
-            $usersDetails[$task->getUserId()]['donePoints'] = $task->getDonePoints();
-        }
-
-        $usersDetails[$task->getUserId()]['tasks'][] = $task;
     }
 
     /**
@@ -194,8 +149,9 @@ class TaskHandler
         $this->entityManager->flush();
 
         $this->updateParent($parent);
+        $context = SerializationContext::create()->setGroups(['Default']);
 
-        return $this->serializer->serialize($task, 'json');
+        return $this->serializer->serialize($task, 'json', $context);
     }
 
     private function updateParent(?Task $parent): void

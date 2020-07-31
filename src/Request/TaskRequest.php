@@ -52,7 +52,7 @@ class TaskRequest
 
     public function __construct(Request $request)
     {
-        $data = json_decode($request->getContent(), true);
+        $data = json_decode($request->getContent() ?? '', true);
         $this->title = $data['title'] ?? null;
         $this->points = $data['points'] ?? null;
         $this->isDone = $data['is_done'] ?? null;

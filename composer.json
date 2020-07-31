@@ -10,7 +10,6 @@
         "doctrine/doctrine-bundle": "^2.1",
         "doctrine/doctrine-migrations-bundle": "^3.0",
         "doctrine/orm": "^2.7",
-        "friendsofsymfony/rest-bundle": "^3.0",
         "gedmo/doctrine-extensions": "^2.4",
         "jms/serializer-bundle": "^3.7",
         "sensio/framework-extra-bundle": "^5.5",

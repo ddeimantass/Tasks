@@ -30,6 +30,7 @@ class TaskControllerTest extends JsonApiTestCase
      */
     public function testList(): void
     {
+        $this->loadFixturesFromFile('tasks.yaml');
         $this->client->request(Request::METHOD_GET, self::URI);
         $response = $this->client->getResponse();
         $this->assertResponse($response, 'taskList', Response::HTTP_OK);
@@ -47,7 +48,6 @@ class TaskControllerTest extends JsonApiTestCase
             [],
             [],
             '{
-                "parent_id":1,
                 "user_id":1,
                 "title":"Task 1",
                 "points":3,
@@ -72,7 +72,6 @@ class TaskControllerTest extends JsonApiTestCase
             [],
             [],
             '{
-                "parent_id":1,
                 "user_id":1,
                 "title":"Task 1",
                 "points":3
@@ -88,7 +87,7 @@ class TaskControllerTest extends JsonApiTestCase
      */
     public function testUpdateSuccess(): void
     {
-
+        $this->loadFixturesFromFile('tasks.yaml');
         /** @var Task $task */
         $task = $this->getEntityManager()->getRepository(Task::class)->findOneBy(['title' => 'Task 1']);
         $this->client->request(
@@ -98,7 +97,6 @@ class TaskControllerTest extends JsonApiTestCase
             [],
             [],
             '{
-                "parent_id":2,
                 "user_id":2,
                 "title":"Task 2",
                 "points":4,
@@ -118,6 +116,7 @@ class TaskControllerTest extends JsonApiTestCase
      */
     public function testUpdateFail(): void
     {
+        $this->loadFixturesFromFile('tasks.yaml');
         /** @var Task $task */
         $task = $this->getEntityManager()->getRepository(Task::class)->findOneBy(['title' => 'Task 1']);
         $this->client->request(
@@ -127,7 +126,6 @@ class TaskControllerTest extends JsonApiTestCase
             [],
             [],
             '{
-                "parent_id":2,
                 "user_id":2,
                 "title":"Task 2",
                 "points":4

@@ -187,6 +187,11 @@ class Task implements AssignmentInterface
         return $this->children;
     }
 
+    public function hasChildren(): bool
+    {
+        return \count($this->children) > 0;
+    }
+
     /**
      * @param Task[] $children
      * @return $this
@@ -228,7 +233,7 @@ class Task implements AssignmentInterface
                 continue;
             }
 
-            if (\count($child->getChildren()) > 0) {
+            if ($child->hasChildren()) {
                 $done += $child->getDonePoints();
             }
         }

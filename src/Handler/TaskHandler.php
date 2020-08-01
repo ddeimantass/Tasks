@@ -140,7 +140,7 @@ class TaskHandler
         }
 
         $task->setTitle($taskRequest->getTitle())
-            ->setPoints($taskRequest->getPoints())
+            ->setPoints($task->hasChildren() ? $task->getPoints() : $taskRequest->getPoints())
             ->setIsDone($taskRequest->isDone())
             ->setUserId($taskRequest->getUserId())
             ->setLevel($level)
@@ -150,6 +150,8 @@ class TaskHandler
         $this->entityManager->flush();
 
         $this->updateParent($parent);
+        $this->updateChildren($task->getChildren()->toArray(), $task->getIsDone());
+
         $context = SerializationContext::create()->setGroups(['Default']);
 
         return $this->serializer->serialize($task, 'json', $context);
@@ -177,5 +179,24 @@ class TaskHandler
         $this->entityManager->flush();
 
         $this->updateParent($parent->getParent());
+    }
+
+    /**
+     * @param Task[] $children
+     * @param bool $isDone
+     */
+    private function updateChildren(array $children, bool $isDone): void
+    {
+        if (0 === \count($children)) {
+            return;
+        }
+
+        foreach ($children as $child) {
+            $this->updateChildren($child->getChildren()->toArray(), $isDone);
+            $child->setIsDone($isDone);
+            $this->entityManager->persist($child);
+        }
+
+        $this->entityManager->flush();
     }
 }

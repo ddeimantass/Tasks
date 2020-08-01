@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace App\Validator\Constraints;
 
-use App\Service\UsersClient;
+use App\Entity\Task;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 use Symfony\Component\Validator\Exception\UnexpectedValueException;
 
-class UserExistsValidator extends ConstraintValidator
+class ParentExistsValidator extends ConstraintValidator
 {
     /**
-     * @var UsersClient
+     * @var EntityManagerInterface
      */
-    private $client;
+    private $entityManager;
 
-    public function __construct(UsersClient $client)
+    public function __construct(EntityManagerInterface $entityManager)
     {
-        $this->client = $client;
+        $this->entityManager = $entityManager;
     }
 
     public function validate($value, Constraint $constraint)
     {
-        if (!$constraint instanceof UserExists) {
-            throw new UnexpectedTypeException($constraint, UserExists::class);
+        if (!$constraint instanceof ParentExists) {
+            throw new UnexpectedTypeException($constraint, ParentExists::class);
         }
 
         if (null === $value || '' === $value) {
@@ -36,9 +37,9 @@ class UserExistsValidator extends ConstraintValidator
             throw new UnexpectedValueException($value, 'int');
         }
 
-        $usersIds = $this->client->getUsersIds();
+        $usersIds = $this->entityManager->find(Task::class, $value);
 
-        if (!in_array($value, $usersIds)) {
+        if (null === $usersIds) {
             $this->context->buildViolation($constraint->message)->addViolation();
         }
     }

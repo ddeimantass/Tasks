@@ -18,6 +18,7 @@ class TaskRequest
 
     /**
      * @var int|null
+     * @AppAssert\ParentExists()
      */
     private $parentId;
 

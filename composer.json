@@ -12,6 +12,7 @@
         "doctrine/orm": "^2.7",
         "gedmo/doctrine-extensions": "^2.4",
         "jms/serializer-bundle": "^3.7",
+        "nelmio/cors-bundle": "^2.1",
         "sensio/framework-extra-bundle": "^5.5",
         "stof/doctrine-extensions-bundle": "^1.4",
         "symfony/console": "5.1.*",

@@ -2,11 +2,12 @@
 
 declare(strict_types=1);
 
-namespace App\Tests\Controller;
+namespace App\Tests\Handler;
 
 use App\DTO\UserModel;
 use App\Entity\Task;
 use App\Handler\TaskHandler;
+use App\Repository\TaskRepository;
 use App\Request\TaskRequest;
 use App\Service\UserTasksProvider;
 use DateTime;
@@ -52,6 +53,19 @@ class TaskHandlerTest extends TestCase
 
     public function testGetList(): void
     {
+        $taskRepository = $this->createMock(TaskRepository::class);
+        $tasks = [new Task()];
+
+        $this->entityManager->expects($this->once())
+            ->method('getRepository')
+            ->with($this->equalTo(Task::class))
+            ->willReturn($taskRepository);
+
+        $taskRepository->expects($this->once())
+            ->method('findBy')
+            ->with($this->equalTo(['parent' => null]))
+            ->willReturn($tasks);
+
         $usersModels = [
             new UserModel(
                 1,
@@ -66,7 +80,8 @@ class TaskHandlerTest extends TestCase
         $context = SerializationContext::create()->setGroups(['list', 'Default']);
 
         $this->provider->expects($this->once())
-            ->method('getUsersTasksModels')
+            ->method('getUsersAssigmentModels')
+            ->with($this->equalTo($tasks))
             ->willReturn($usersModels);
 
         $this->serializer->expects($this->once())

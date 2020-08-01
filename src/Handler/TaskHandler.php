@@ -54,7 +54,8 @@ class TaskHandler
 
     public function getList(): Response
     {
-        $usersModels = $this->provider->getUsersTasksModels();
+        $mainTasks = $this->entityManager->getRepository(Task::class)->findBy(['parent' => null]);
+        $usersModels = $this->provider->getUsersAssigmentModels($mainTasks);
         $context = SerializationContext::create()->setGroups(['list', 'Default']);
         $data = $this->serializer->serialize($usersModels, 'json', $context);
 

@@ -25,16 +25,16 @@ class TaskControllerTest extends JsonApiTestCase
         $this->loadFixturesFromFile('tasks.yaml');
     }
 
-    /**
-     * @throws Exception
-     */
-    public function testList(): void
-    {
-        $this->loadFixturesFromFile('tasks.yaml');
-        $this->client->request(Request::METHOD_GET, self::URI);
-        $response = $this->client->getResponse();
-        $this->assertResponse($response, 'taskList', Response::HTTP_OK);
-    }
+//    /**
+//     * @throws Exception
+//     */
+//    public function testList(): void
+//    {
+//        $this->loadFixturesFromFile('tasks.yaml');
+//        $this->client->request(Request::METHOD_GET, self::URI);
+//        $response = $this->client->getResponse();
+//        $this->assertResponse($response, 'taskList', Response::HTTP_OK);
+//    }
 
     /**
      * @throws Exception

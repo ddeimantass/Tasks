@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace App\DTO;
 
+use App\Entity\AssignmentInterface;
 use App\Entity\Task;
 
-class UserTasksModel
+class UserAssignmentsModel
 {
     /**
      * @var string
@@ -24,7 +25,7 @@ class UserTasksModel
     private $donePoints;
 
     /**
-     * @var Task[]
+     * @var AssignmentInterface[]
      */
     private $tasks;
 
@@ -32,7 +33,7 @@ class UserTasksModel
      * @param string $name
      * @param int $totalPoints
      * @param int $donePoints
-     * @param Task[] $tasks
+     * @param AssignmentInterface[] $tasks
      */
     public function __construct(string $name, int $totalPoints, int $donePoints, array $tasks)
     {

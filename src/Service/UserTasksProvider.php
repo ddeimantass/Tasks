@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace App\Service;
 
-use App\DTO\UserTasksModel;
-use App\Entity\Task;
+use App\DTO\UserAssignmentsModel;
+use App\Entity\AssignmentInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
 class UserTasksProvider
@@ -23,46 +23,44 @@ class UserTasksProvider
     }
 
     /**
-     * @return UserTasksModel[]
+     * @param AssignmentInterface[]
+     * @return UserAssignmentsModel[]
      */
-    public function getUsersTasksModels(): array
+    public function getUsersAssigmentModels(array $assignments): array
     {
-        $usersDetails = $usersModels = [];
-        $mainTasks = $this->entityManager->getRepository(Task::class)->findBy(['parent' => null]);
-
-        /** @var Task $task */
-        foreach ($mainTasks as $task) {
-            $this->setDetails($usersDetails, $task);
+        $usersDetails = $userTasksModels = [];
+        foreach ($assignments as $assignment) {
+            $this->setDetails($usersDetails, $assignment);
         }
 
         $users = $this->client->getUsers();
         foreach ($usersDetails as $id => $userDetails) {
             $fullName = isset($users[$id]) ? $users[$id]->getFullName() : 'Unknown';
-            $usersModels[] = new UserTasksModel(
+            $userTasksModels[] = new UserAssignmentsModel(
                 $fullName,
                 $userDetails['totalPoints'],
                 $userDetails['donePoints'],
-                $userDetails['tasks']
+                $userDetails['assignments']
             );
         }
 
-        return $usersModels;
+        return $userTasksModels;
     }
 
     /**
      * @param array $usersDetails
-     * @param Task $task
+     * @param AssignmentInterface $assignment
      */
-    private function setDetails(array &$usersDetails, Task $task): void
+    private function setDetails(array &$usersDetails, AssignmentInterface $assignment): void
     {
-        if (isset($usersDetails[$task->getUserId()])) {
-            $usersDetails[$task->getUserId()]['totalPoints'] += $task->getPoints();
-            $usersDetails[$task->getUserId()]['donePoints'] += $task->getDonePoints();
+        if (isset($usersDetails[$assignment->getUserId()])) {
+            $usersDetails[$assignment->getUserId()]['totalPoints'] += $assignment->getPoints();
+            $usersDetails[$assignment->getUserId()]['donePoints'] += $assignment->getDonePoints();
         } else {
-            $usersDetails[$task->getUserId()]['totalPoints'] = $task->getPoints();
-            $usersDetails[$task->getUserId()]['donePoints'] = $task->getDonePoints();
+            $usersDetails[$assignment->getUserId()]['totalPoints'] = $assignment->getPoints();
+            $usersDetails[$assignment->getUserId()]['donePoints'] = $assignment->getDonePoints();
         }
 
-        $usersDetails[$task->getUserId()]['tasks'][] = $task;
+        $usersDetails[$assignment->getUserId()]['assignments'][] = $assignment;
     }
 }

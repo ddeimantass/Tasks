@@ -9,14 +9,13 @@ use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Gedmo\Timestampable\Traits\Timestampable;
 use JMS\Serializer\Annotation as JMS;
 use Gedmo\Mapping\Annotation as Gedmo;
 
 /**
  * @ORM\Entity(repositoryClass=TaskRepository::class)
  */
-class Task
+class Task implements AssignmentInterface
 {
     /**
      * @var int
@@ -94,12 +93,12 @@ class Task
         $this->children = new ArrayCollection();
     }
 
-    public function getId(): ?int
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    public function getTitle(): string
     {
         return $this->title;
     }
@@ -111,7 +110,7 @@ class Task
         return $this;
     }
 
-    public function getPoints(): ?int
+    public function getPoints(): int
     {
         return $this->points;
     }
@@ -135,7 +134,7 @@ class Task
         return $this;
     }
 
-    public function getUserId(): ?int
+    public function getUserId(): int
     {
         return $this->userId;
     }

@@ -32,6 +32,7 @@ symfony serve
 
 ### Run Tests
 
+- change DB credentials in .env.test
 ```
 bin/console d:d:c --env=test
 bin/console d:s:u --force --env=test

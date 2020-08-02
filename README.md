@@ -41,10 +41,10 @@ bin/phpunit
 
 #### Create Endpoint
 
-Method: POST
-URI: /api/task
-Success response code: 201 
-Request example:
+- Method: POST
+- URI: /api/task
+- Success response code: 201 
+- Request example:
 ```
 {
     "parent_id":1,
@@ -77,10 +77,10 @@ Validations:
 
 #### Update Endpoint
 
-Method: PUT
-URI: /api/task/{task_id}
-Success response code: 201 
-Request example:
+- Method: PUT
+- URI: /api/task/{task_id}
+- Success response code: 201 
+- Request example:
 ```
 {
     "parent_id":1,

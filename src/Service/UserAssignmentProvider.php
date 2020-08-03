@@ -8,7 +8,7 @@ use App\DTO\UserAssignmentsModel;
 use App\Entity\AssignmentInterface;
 use Doctrine\ORM\EntityManagerInterface;
 
-class UserTasksProvider
+class UserAssignmentProvider
 {
     /** @var UsersClient */
     private $client;

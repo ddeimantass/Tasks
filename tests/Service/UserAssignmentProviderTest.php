@@ -13,7 +13,7 @@ use App\Handler\TaskHandler;
 use App\Repository\TaskRepository;
 use App\Request\TaskRequest;
 use App\Service\UsersClient;
-use App\Service\UserTasksProvider;
+use App\Service\UserAssignmentProvider;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
@@ -24,7 +24,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolationListInterface;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
-class UserTasksProviderTest extends TestCase
+class UserAssignmentProviderTest extends TestCase
 {
     /** @var EntityManagerInterface */
     private $entityManager;
@@ -32,14 +32,14 @@ class UserTasksProviderTest extends TestCase
     /** @var UsersClient */
     private $client;
 
-    /** @var UserTasksProvider */
+    /** @var UserAssignmentProvider */
     private $provider;
 
     public function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->client = $this->createMock(UsersClient::class);
-        $this->provider = new UserTasksProvider($this->client, $this->entityManager);
+        $this->provider = new UserAssignmentProvider($this->client, $this->entityManager);
     }
 
     public function testGetUsersAssigmentModels(): void

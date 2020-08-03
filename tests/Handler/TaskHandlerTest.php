@@ -9,7 +9,8 @@ use App\Entity\Task;
 use App\Handler\TaskHandler;
 use App\Repository\TaskRepository;
 use App\Request\TaskRequest;
-use App\Service\UserTasksProvider;
+use App\Service\TaskService;
+use App\Service\UserAssignmentProvider;
 use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use JMS\Serializer\SerializationContext;
@@ -28,10 +29,10 @@ class TaskHandlerTest extends TestCase
     /** @var SerializerInterface */
     private $serializer;
 
-    /** @var ValidatorInterface */
-    private $validator;
+    /** @var TaskService */
+    private $taskService;
 
-    /** @var UserTasksProvider */
+    /** @var UserAssignmentProvider */
     private $provider;
 
     /** @var TaskHandler */
@@ -41,12 +42,12 @@ class TaskHandlerTest extends TestCase
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
         $this->serializer = $this->createMock(SerializerInterface::class);
-        $this->validator = $this->createMock(ValidatorInterface::class);
-        $this->provider = $this->createMock(UserTasksProvider::class);
+        $this->taskService = $this->createMock(TaskService::class);
+        $this->provider = $this->createMock(UserAssignmentProvider::class);
         $this->handler = new TaskHandler(
             $this->serializer,
             $this->entityManager,
-            $this->validator,
+            $this->taskService,
             $this->provider
         );
     }
@@ -93,16 +94,32 @@ class TaskHandlerTest extends TestCase
         $this->assertEquals($expected, $this->handler->getList());
     }
 
-    public function testCreateAndUpdateTask(): void
+    public function testCreateTask(): void
     {
         $content = '{"user_id":1, "title":"Task 1", "points":1, "is_done":1}';
         $request = new Request([], [], [], [], [], [], $content);
         $taskRequest = new TaskRequest($request);
-        $violationList = $this->createMock(ConstraintViolationListInterface::class);
-        $this->validator->expects($this->once())
+        $this->taskService->expects($this->once())
             ->method('validate')
-            ->with($taskRequest)
-            ->willReturn($violationList);
+            ->with($taskRequest);
+
+        $this->taskService->expects($this->once())
+            ->method('saveTask')
+            ->with($this->equalTo($taskRequest))
+            ->willReturn('');
+
+        $expected = new Response('', Response::HTTP_CREATED);
+        $this->assertEquals($expected, $this->handler->create($request));
+    }
+
+    public function testUpdateTask(): void
+    {
+        $content = '{"user_id":1, "title":"Task 1", "points":1, "is_done":1}';
+        $request = new Request([], [], [], [], [], [], $content);
+        $taskRequest = new TaskRequest($request);
+        $this->taskService->expects($this->once())
+            ->method('validate')
+            ->with($taskRequest);
 
         $task = new Task();
         $task->setTitle('Task 1')
@@ -112,20 +129,12 @@ class TaskHandlerTest extends TestCase
             ->setLevel(1)
             ->setParent(null);
 
-        $this->entityManager->expects($this->once())
-            ->method('persist')
-            ->with($task);
-
-        $this->entityManager->expects($this->once())
-            ->method('flush');
-
-        $context = SerializationContext::create()->setGroups(['Default']);
-        $this->serializer->expects($this->once())
-            ->method('serialize')
-            ->with($this->equalTo($task), $this->equalTo('json'), $this->equalTo($context))
+        $this->taskService->expects($this->once())
+            ->method('saveTask')
+            ->with($this->equalTo($taskRequest), $this->equalTo($task))
             ->willReturn('');
 
         $expected = new Response('', Response::HTTP_CREATED);
-        $this->assertEquals($expected, $this->handler->create($request));
+        $this->assertEquals($expected, $this->handler->update($request, $task));
     }
 }
